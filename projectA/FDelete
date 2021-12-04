@@ -1,0 +1,191 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace practice_project
+{
+    public partial class FDelete : Form
+    {
+        public FDelete()
+        {
+            InitializeComponent();
+        }
+
+        public int id;
+
+        public static string CONSTR = "DELETE FROM dbo.MOVIES WHERE Id=@id";
+
+        SqlConnect con = new SqlConnect(CONSTR);
+        private object msg;
+        private object gvdtl;
+
+        public object getdata(string str)
+        {
+            SqlConnection con = new SqlConnection(CONSTR);
+
+            con.Open();
+
+            object a;
+
+            SqlCommand cmd = new SqlCommand(str, con);
+
+            a = cmd.ExecuteScalar();
+
+            con.Close();
+
+            return a;
+        }
+
+        public void display()
+        {
+            string str = "SELECT Id, Title, Year, Director, Genre, RottenTomatoesScore, TotalEarned FROM dbo.MOVIES ORDER BY Title";
+            SqlDataAdapter dap = new SqlDataAdapter();
+
+            DataSet ds = new DataSet();
+
+            con.Open();
+
+            dap.Fill(ds);
+
+            if (ds.Tables[0].Rows.Count <= 0)
+            {
+               // msg.Text = "No Records Found.";
+
+               // msg.Visible = true;
+
+              //  gvdtl.Visible = false;
+            }
+
+            else
+
+            {
+
+               // msg.Visible = false;
+
+               // gvdtl.Visible = true;
+
+                //gvdtl.DataSource = ds.Tables[0].DefaultView;
+
+            }
+
+            con.Close();
+
+        }
+
+        private void gvdtl_CellContentClick(System.Object sender, System.Windows.Forms.DataGridViewCellEventArgs e)
+
+        {
+
+            if (e.ColumnIndex == 0)
+
+            {
+
+                string s = gvdtl.Rows[e.RowIndex].Cells[1].FormattedValue.ToString();
+
+                id = Convert.ToInt16(s);
+
+                TxtTitle.Text = "";
+
+                string que;
+
+                que = "SELECT Id, Title, Year, Director, Genre, RottenTomatoesScore, TotalEarned FROM dbo.MOVIES ORDER BY Title" + id + "";
+
+                TxtTitle.Text = getdata(que).ToString();
+
+            }
+        }
+
+
+            private void FDelete_Load(object sender, EventArgs e)
+        {
+                display();
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ClearSelection();
+        }
+
+        private void ClearSelection()
+        {
+            TxtTitle.Clear();
+            TxtYear.Clear();
+            TxtDirector.Clear();
+            TxtEarnings.Clear();
+            CbGenre.SelectedIndex = -1;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Are You sure You Want To Delete This Movie?", "Delete Confirmation", MessageBoxButtons.OKCancel);
+            if (result == DialogResult.Yes)
+            {
+                string str;
+                SqlCommand cmd1;
+                con.Open();
+                str = "SELECT Id, Title, Year, Director, Genre, RottenTomatoesScore, TotalEarned FROM dbo.MOVIES ORDER BY Title" + id + "";
+                cmd1 = new SqlCommand();
+                cmd1.ExecuteNonQuery();
+
+                cmd1.Dispose();
+
+                con.Close();
+
+                MessageBox.Show("Record Delete Successfully.");
+
+                TxtTitle.Text = "";
+
+                display();
+
+            }
+            else
+
+            {
+
+                MessageBox.Show("Record Delete UnSuccessfully.");
+
+            }
+
+        }
+        public void deletedata(string str)
+
+        {
+
+            SqlConnection con = new SqlConnection(CONSTR);
+
+            con.Open();
+
+            SqlCommand cmd = new SqlCommand(str, con);
+
+            cmd.ExecuteNonQuery();
+
+            con.Close();
+
+        }
+
+
+    }
+
+    }
